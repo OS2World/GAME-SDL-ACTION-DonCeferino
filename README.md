@@ -7,7 +7,7 @@ the high scores.
 This repository contains the **ArcaOS / OS/2 port** (SDL2), version **0.97.8 Release 2**.
 The original game was developed by Hugo Ruscitti and Walter Velazquez using SDL 1.x.
 
-![Don Ceferino ScreenShot](/docs/DonCeferino.png)
+![Don Ceferino ScreenShot](/doc/DonCeferino.png)
 
 ---
 
