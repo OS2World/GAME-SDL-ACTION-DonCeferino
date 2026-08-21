@@ -1,17 +1,17 @@
-/*
- * Don Ceferino Hazaña - video game similary to Super Pang!
+ï»¿/*
+ * Don Ceferino Hazaï¿½a - video game similary to Super Pang!
  * Copyright (c) 2004, 2005 Hugo Ruscitti
  * web site: http://www.loosersjuegos.com.ar
  * 
- * This file is part of Don Ceferino Hazaña (ceferino).
+ * This file is part of Don Ceferino Hazaï¿½a (ceferino).
  * Written by Hugo Ruscitti <hugoruscitti@yahoo.com.ar>
  *
- * Don Ceferino Hazaña is free software; you can redistribute it and/or modify
+ * Don Ceferino Hazaï¿½a is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
  *
- * Don Ceferino Hazaña is distributed in the hope that it will be useful,
+ * Don Ceferino Hazaï¿½a is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -24,11 +24,12 @@
 
 
 #include <stdio.h>
-#include <SDL/SDL.h>
+#include <SDL2/SDL.h>
 #include "utils.h"
 #include <stdlib.h>
 #include <string.h>
 #include "int.h"
+#include "sdl2_compat.h"
 
 /*!
  * \brief limpia la pantalla
@@ -224,7 +225,7 @@ SDL_Surface *reescalar_mitad(SDL_Surface *ima)
 {
 	SDL_Surface *ima2;
 
-	ima2 = SDL_CreateRGBSurface(SDL_SWSURFACE, ima->w/2, ima->h/2, ima->format->BitsPerPixel, ima->format->Rmask, ima->format->Gmask, ima->format->Bmask, ima->format->Amask);
+	ima2 = SDL_CreateRGBSurface(0, ima->w/2, ima->h/2, ima->format->BitsPerPixel, ima->format->Rmask, ima->format->Gmask, ima->format->Bmask, ima->format->Amask);
 
 	if (ima2==NULL)
 	{
@@ -297,13 +298,7 @@ void cargar_marcas_estandar(void)
 	char ruta_completa[100];
 	FILE *arch;
 
-#ifdef WIN32
-	strcpy(ruta_completa, "marcas.dat");
-#else
-	strcpy(ruta_completa, getenv("HOME"));
-	strcat(ruta_completa, "/");
-	strcat(ruta_completa, ".ceferinomarcas");
-#endif
+	ceferino_config_path(ruta_completa, sizeof(ruta_completa), "marcas.dat");
 	strcpy(vec_marcas[0].nombre, "matar bros");
 	strcpy(vec_marcas[1].nombre, "pepe");
 	strcpy(vec_marcas[2].nombre, "kenny");

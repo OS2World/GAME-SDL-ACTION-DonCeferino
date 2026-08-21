@@ -1,17 +1,17 @@
-/*
- * Don Ceferino Hazaña - video game similary to Super Pang!
+ï»¿/*
+ * Don Ceferino Hazaï¿½a - video game similary to Super Pang!
  * Copyright (c) 2004, 2005 Hugo Ruscitti
  * web site: http://www.loosersjuegos.com.ar
  * 
- * This file is part of Don Ceferino Hazaña (ceferino).
+ * This file is part of Don Ceferino Hazaï¿½a (ceferino).
  * Written by Hugo Ruscitti <hugoruscitti@yahoo.com.ar>
  *
- * Don Ceferino Hazaña is free software; you can redistribute it and/or modify
+ * Don Ceferino Hazaï¿½a is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
  *
- * Don Ceferino Hazaña is distributed in the hope that it will be useful,
+ * Don Ceferino Hazaï¿½a is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -136,19 +136,11 @@ void barra :: imprimir_puntos(void)
  */
 void barra :: imprimir_todo(void)
 {
-	int h;
-
-	if (screen->h == 480)
-		h=32;
-	else
-		h=16;
-	
 	imprimir_fondo(); 
 	imprimir_tiempo();
 	imprimir_vidas();
 	imprimir_puntos();
 	
-	SDL_UpdateRect(screen, 0, screen->h-h, screen->w, h);
 }
 
 /*!
@@ -177,5 +169,4 @@ void barra :: actualizar(int _tiempo, int _vidas, int _puntos)
 	ant_vidas = vidas;
 	ant_puntos = puntos;
 	
-	SDL_UpdateRect(screen, rect.x, rect.y, rect.w, rect.h);
 }

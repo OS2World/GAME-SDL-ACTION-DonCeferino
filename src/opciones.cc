@@ -1,17 +1,17 @@
 /*
- * Don Ceferino Hazaña - video game similary to Super Pang!
+ * Don Ceferino Hazaï¿½a - video game similary to Super Pang!
  * Copyright (c) 2004, 2005 Hugo Ruscitti
  * web site: http://www.loosersjuegos.com.ar
  * 
- * This file is part of Don Ceferino Hazaña (ceferino).
+ * This file is part of Don Ceferino Hazaï¿½a (ceferino).
  * Written by Hugo Ruscitti <hugoruscitti@yahoo.com.ar>
  *
- * Don Ceferino Hazaña is free software; you can redistribute it and/or modify
+ * Don Ceferino Hazaï¿½a is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
  *
- * Don Ceferino Hazaña is distributed in the hope that it will be useful,
+ * Don Ceferino Hazaï¿½a is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -22,7 +22,7 @@
  * 
  */
 
-#include <SDL/SDL.h>
+#include <SDL2/SDL.h>
 #include <string.h>
 
 #include "menu.h"
@@ -57,7 +57,7 @@ int opciones :: iniciar(class mundo *_pmundo, int _modo_video, SDL_Surface *_scr
 	modo_video = _modo_video;
 	screen = _screen;
 
-	fondo = SDL_DisplayFormat(screen);
+	fondo = SDL_ConvertSurface(screen, screen->format, 0);
 
 	if (fondo == NULL)
 	{
@@ -75,21 +75,21 @@ int opciones :: iniciar(class mundo *_pmundo, int _modo_video, SDL_Surface *_scr
 	
 	imprimir_pie ();
 
-	SDL_Flip(screen);
+	Ceferino_Flip(screen);
 	return 0;
 }
 
 
 /*!
- * \brief actualizacón lógica
+ * \brief actualizacï¿½n lï¿½gica
  */
 void opciones :: actualizar(void)
 {
-	Uint8 * tecla;
+	const Uint8 *tecla;
 	
-	tecla = SDL_GetKeyState(NULL);
+	tecla = SDL_GetKeyboardState(NULL);
 
-	if (tecla [SDLK_ESCAPE] || tecla [SDLK_SPACE])
+	if (tecla[K(SDLK_ESCAPE)] || tecla[K(SDLK_SPACE)])
 	{
 		pmundo->audio.play (4);
 		pmundo->cambiar_escena (MENU);

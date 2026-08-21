@@ -77,7 +77,7 @@ bool fuente2 :: es_pixel_opaco (SDL_Surface * ima, int fila, int col)
 	int bpp = ima->format->BytesPerPixel;
 	Uint8 r, g, b, a;
 	Uint8 * p; 
-	Uint32 color;
+	Uint32 color = 0;
 
 	p = (Uint8 *) ima->pixels;
 	p += col * bpp + fila * ima->pitch;
@@ -180,7 +180,6 @@ SDL_Rect fuente2 :: obtener_referencia (char letra, bool transparente)
 				"{|}~¡¢£€¥Š§š©ª«¬­®¯°±²³Žµ¶·ž¹º»ŒœŸ¿" \
 				"ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäå" \
 				"æçèéêëìíîïðñòóôõö÷øùúûüýþÿ";
-				"àèìòùâêîôû";
 
 	if (letra == ' ' || letra == '\0' || letra == '\n')
 	{
@@ -249,7 +248,6 @@ void fuente2 :: myprintf (SDL_Surface * dst, int x, int y, SDL_Rect * rect, \
 {
 	char buffer [1024];
 	va_list va;
-	int i;
 
 	if (! format)
 		return;
@@ -323,7 +321,6 @@ void fuente2 :: alinear_inferior (int * x1, int * y1, char * cadena)
 	int f = 0;
 	int c = 20;
 	char * palabra = cadena;
-	char * offset;
 	int limite_w = 640;/*(modo_reducido)? 320: 640;*/
 	int limite_h = 480;/*(modo_reducido)? 240: 480;*/
 
@@ -360,7 +357,6 @@ int fuente2 :: ancho_palabra (char * palabra)
 {
 	int i;
 	int ancho = 0;
-	SDL_Rect rect;
 
 	for (i = 0; palabra [i] != ' ' && palabra [i] != '\0' \
 			&& palabra [i] != '\n'; i ++)
@@ -430,8 +426,7 @@ char * fuente2 :: saltar_palabra (char * cadena)
 			return cadena + i;
 	}
 
-	if (cadena [i] == '\0')
-		return NULL;
+	return NULL;
 }
 
 void fuente2 :: imprimir (SDL_Surface * dst, char * cadena, int x, \

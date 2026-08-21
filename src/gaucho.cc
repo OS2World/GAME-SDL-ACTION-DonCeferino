@@ -1,17 +1,17 @@
-/*
- * Don Ceferino Hazaña - video game similary to Super Pang!
+ï»¿/*
+ * Don Ceferino Hazaï¿½a - video game similary to Super Pang!
  * Copyright (c) 2004, 2005 Hugo Ruscitti
  * web site: http://www.loosersjuegos.com.ar
  * 
- * This file is part of Don Ceferino Hazaña (ceferino).
+ * This file is part of Don Ceferino Hazaï¿½a (ceferino).
  * Written by Hugo Ruscitti <hugoruscitti@yahoo.com.ar>
  *
- * Don Ceferino Hazaña is free software; you can redistribute it and/or modify
+ * Don Ceferino Hazaï¿½a is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
  *
- * Don Ceferino Hazaña is distributed in the hope that it will be useful,
+ * Don Ceferino Hazaï¿½a is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -80,32 +80,32 @@ int gaucho :: iniciar(class juego *_juego, grafico *_graficos, int _x, int _y)
 
 bool gaucho :: slash(void)
 {
-    return tecla[SDLK_1] or tecla[SDLK_3] or tecla[SDLK_z] or tecla[SDLK_c];
+    return tecla[K(SDLK_1)] or tecla[K(SDLK_3)] or tecla[K(SDLK_z)] or tecla[K(SDLK_c)];
 }
 
 bool gaucho :: left(void)
 {
-    return tecla[SDLK_LEFT] or tecla[SDLK_h] or tecla[SDLK_a];
+    return tecla[K(SDLK_LEFT)] or tecla[K(SDLK_h)] or tecla[K(SDLK_a)];
 }
 
 bool gaucho :: right(void)
 {
-    return tecla[SDLK_RIGHT] or tecla[SDLK_l] or tecla[SDLK_d];
+    return tecla[K(SDLK_RIGHT)] or tecla[K(SDLK_l)] or tecla[K(SDLK_d)];
 }
 
 bool gaucho :: shot(void)
 {
-    return tecla[SDLK_x] or tecla[SDLK_2];
+    return tecla[K(SDLK_x)] or tecla[K(SDLK_2)];
 }
 
 bool gaucho :: up(void)
 {
-    return tecla[SDLK_UP] or tecla[SDLK_k] or tecla[SDLK_w];
+    return tecla[K(SDLK_UP)] or tecla[K(SDLK_k)] or tecla[K(SDLK_w)];
 }
 
 bool gaucho :: down(void)
 {
-    return tecla[SDLK_DOWN] or tecla[SDLK_j] or tecla[SDLK_s];
+    return tecla[K(SDLK_DOWN)] or tecla[K(SDLK_j)] or tecla[K(SDLK_s)];
 }
 
 /*!
@@ -113,7 +113,7 @@ bool gaucho :: down(void)
  */
 void gaucho :: actualizar(void)
 {
-	tecla = SDL_GetKeyState(NULL);
+	tecla = SDL_GetKeyboardState(NULL);
 	
 	switch (estado)
 	{
@@ -121,7 +121,7 @@ void gaucho :: actualizar(void)
 			parado();
 
 			/* Cheat */
-			if (tecla[SDLK_b] && tecla[SDLK_o]) // (bo)om
+			if (tecla[K(SDLK_b)] && tecla[K(SDLK_o)]) // (bo)om
 			{
 				reiniciar_animacion();
 				estado=BOMBA;
@@ -597,7 +597,7 @@ void gaucho :: cae_girando(void)
 
 
 /*!
- * \brief animación del disparo de la bomba
+ * \brief animaciï¿½n del disparo de la bomba
  */
 void gaucho :: tirando_bomba(void)
 {

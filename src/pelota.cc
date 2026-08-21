@@ -1,17 +1,17 @@
 /*
- * Don Ceferino Hazaña - video game similary to Super Pang!
+ * Don Ceferino Hazaï¿½a - video game similary to Super Pang!
  * Copyright (c) 2004, 2005 Hugo Ruscitti
  * web site: http://www.loosersjuegos.com.ar
  * 
- * This file is part of Don Ceferino Hazaña (ceferino).
+ * This file is part of Don Ceferino Hazaï¿½a (ceferino).
  * Written by Hugo Ruscitti <hugoruscitti@yahoo.com.ar>
  *
- * Don Ceferino Hazaña is free software; you can redistribute it and/or modify
+ * Don Ceferino Hazaï¿½a is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
  *
- * Don Ceferino Hazaña is distributed in the hope that it will be useful,
+ * Don Ceferino Hazaï¿½a is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -51,11 +51,11 @@ int pelota :: iniciar(class juego *_juego, grafico *_graf, int _x, int _y, int _
 			break;
 		case 2:
 			w=18;
-			vel_salto=-4,3;
+			vel_salto=-4;
 			break;
 		case 3:
 			w=37;
-			vel_salto=-4,8;
+			vel_salto=-4;
 			break;
 		case 4:
 			w=75;
@@ -69,7 +69,7 @@ int pelota :: iniciar(class juego *_juego, grafico *_graf, int _x, int _y, int _
 
 
 /*!
- * \brief actualización lógica
+ * \brief actualizaciï¿½n lï¿½gica
  */
 void pelota :: actualizar(int mover=1)
 {

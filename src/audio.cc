@@ -1,17 +1,17 @@
 /*
- * Don Ceferino Hazaña - video game similary to Super Pang!
+ * Don Ceferino Hazaï¿½a - video game similary to Super Pang!
  * Copyright (c) 2004, 2005 Hugo Ruscitti
  * web site: http://www.loosersjuegos.com.ar
  * 
- * This file is part of Don Ceferino Hazaña (ceferino).
+ * This file is part of Don Ceferino Hazaï¿½a (ceferino).
  * Written by Hugo Ruscitti <hugoruscitti@yahoo.com.ar>
  *
- * Don Ceferino Hazaña is free software; you can redistribute it and/or modify
+ * Don Ceferino Hazaï¿½a is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
  *
- * Don Ceferino Hazaña is distributed in the hope that it will be useful,
+ * Don Ceferino Hazaï¿½a is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -61,8 +61,10 @@ void audio :: iniciar(int _hab_sonido, int _hab_musica)
 	{
 		printf(_("+ Starting audio system: "));
 
+		Mix_Init(MIX_INIT_MOD | MIX_INIT_OGG);
+
 		if (SDL_InitSubSystem( SDL_INIT_AUDIO) == -1 ||\
-				Mix_OpenAudio(44100, AUDIO_S16SYS, 2, 2048) < 0)
+				Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096) < 0)
 		{
 			imprimir_error();
 			printf("error: %s\n", SDL_GetError());
@@ -212,7 +214,7 @@ void audio :: descargar_sonidos(void)
  */
 void audio :: descargar_musicas(void)
 {
-	Mix_Resume(canal_musica);
-//	Mix_FreeMusic(musicas[0]);
-//	Mix_FreeMusic(musicas[1]);
+	Mix_FadeOutMusic(100);
+	Mix_FreeMusic(musicas[0]);
+	Mix_FreeMusic(musicas[1]);
 }

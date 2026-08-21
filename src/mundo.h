@@ -1,17 +1,17 @@
 /*
- * Don Ceferino Hazaña - video game similary to Super Pang!
+ * Don Ceferino Hazaï¿½a - video game similary to Super Pang!
  * Copyright (c) 2004, 2005 Hugo Ruscitti
  * web site: http://www.loosersjuegos.com.ar
  * 
- * This file is part of Don Ceferino Hazaña (ceferino).
+ * This file is part of Don Ceferino Hazaï¿½a (ceferino).
  * Written by Hugo Ruscitti <hugoruscitti@yahoo.com.ar>
  *
- * Don Ceferino Hazaña is free software; you can redistribute it and/or modify
+ * Don Ceferino Hazaï¿½a is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
  *
- * Don Ceferino Hazaña is distributed in the hope that it will be useful,
+ * Don Ceferino Hazaï¿½a is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -24,7 +24,8 @@
 #ifndef _MUNDO_H
 #define _MUNDO_H
 
-#include <SDL/SDL.h>
+#include <SDL2/SDL.h>
+#include "sdl2_compat.h"
 #include "escena.h"
 #include "menu.h"
 #include "creditos.h"
@@ -87,7 +88,7 @@ class mundo
 		struct opciones_t opciones;
 		int leer_teclas;
 	
-		int t, tl, tg; // tick actual, lógico y grafico
+		int t, tl, tg; // tick actual, lï¿½gico y grafico
 };
 
 #endif

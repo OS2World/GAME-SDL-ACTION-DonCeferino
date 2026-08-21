@@ -1,7 +1,7 @@
 #ifndef _INTL_H
 #define _INTL_H
 
-#ifndef WIN32
+#if !defined(WIN32) && !defined(__OS2__)
 	#include <locale.h>
 	#include <libintl.h>
 

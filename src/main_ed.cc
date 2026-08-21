@@ -1,17 +1,17 @@
 /*
- * Don Ceferino Hazaña - video game similary to Super Pang!
+ * Don Ceferino Haza?a - video game similary to Super Pang!
  * Copyright (c) 2004, 2005 Hugo Ruscitti
  * web site: http://www.loosersjuegos.com.ar
  * 
- * This file is part of Don Ceferino Hazaña (ceferino).
+ * This file is part of Don Ceferino Haza?a (ceferino).
  * Written by Hugo Ruscitti <hugoruscitti@yahoo.com.ar>
  *
- * Don Ceferino Hazaña is free software; you can redistribute it and/or modify
+ * Don Ceferino Haza?a is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
  *
- * Don Ceferino Hazaña is distributed in the hope that it will be useful,
+ * Don Ceferino Haza?a is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -23,14 +23,15 @@
  */
 
 
-#include <SDL/SDL.h>
-#include <SDL/SDL_image.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 #include <string.h>
 #include <errno.h>
 #include <stdlib.h>
 #include "grafico.h"
 #include "main_ed.h"
 #include "utils.h"
+#include "sdl2_compat.h"
 
 
 /*!
@@ -77,7 +78,7 @@ int main (int argc, char * argv [])
 					salir=1;
 
 				if (evento.key.keysym.sym == SDLK_f)
-					SDL_WM_ToggleFullScreen(screen);
+					Ceferino_ToggleFullscreen();
 			}
 		}
 
@@ -87,6 +88,9 @@ int main (int argc, char * argv [])
 	guardar_nivel(mapa, arch, barra.nivel);
 	fclose(arch);
 	SDL_FreeSurface(screen);
+	SDL_DestroyTexture(g_screen_texture);
+	SDL_DestroyRenderer(g_renderer);
+	SDL_DestroyWindow(g_window);
 	SDL_Quit();
 	return 0;
 }
@@ -111,18 +115,48 @@ int iniciar(SDL_Surface **screen, FILE **arch)
 		return 1;
 	}
 
-	*screen = SDL_SetVideoMode(640, 480, 16,  SDL_HWSURFACE);
-
-	if (*screen == NULL)
+	g_window = SDL_CreateWindow(
+		"Editor de niveles - Don Ceferino Hazana",
+		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+		640, 480, SDL_WINDOW_RESIZABLE);
+	if (!g_window)
 	{
 		printf("error: %s\n", SDL_GetError());
 		return 1;
 	}
 
-	SDL_WM_SetCaption("Editor de niveles para el juego Don Ceferino Hazaña - Losers", NULL);
+	g_renderer = SDL_CreateRenderer(g_window, -1, SDL_RENDERER_ACCELERATED);
+	if (!g_renderer)
+		g_renderer = SDL_CreateRenderer(g_window, -1, 0);
+	if (!g_renderer)
+	{
+		printf("error: %s\n", SDL_GetError());
+		return 1;
+	}
 
-	
-#ifdef WIN32
+	SDL_RenderSetLogicalSize(g_renderer, 640, 480);
+
+	*screen = SDL_CreateRGBSurface(0, 640, 480, 32,
+		0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
+	if (!*screen)
+	{
+		printf("error: %s\n", SDL_GetError());
+		return 1;
+	}
+
+	g_screen_texture = SDL_CreateTexture(g_renderer, SDL_PIXELFORMAT_ARGB8888,
+		SDL_TEXTUREACCESS_STREAMING, 640, 480);
+	if (!g_screen_texture)
+	{
+		printf("error: %s\n", SDL_GetError());
+		return 1;
+	}
+
+	SDL_ShowCursor(SDL_DISABLE);
+
+#if defined(__OS2__)
+	ceferino_config_path(tmp, sizeof(tmp), "ceferinoniveles.map");
+#elif defined(WIN32)
 	strcpy(tmp, "levels/base.map");
 #else
 	strcpy(tmp, getenv("HOME"));
@@ -187,7 +221,6 @@ void imprimir_barra(SDL_Surface *screen, grafico *bloques, grafico *panel, struc
 			panel->imprimir(i, screen, &tmp, x, 480-32,1);
 	}
 
-	SDL_UpdateRect(screen, rect.x, rect.y, rect.w, rect.h);
 }
 
 /*!
@@ -254,7 +287,6 @@ void imprimir_bloque(SDL_Surface *screen, grafico *graficos, int f, int c, int i
 	SDL_FillRect(screen, &tmp, SDL_MapRGB(screen->format, 80,80,80));
 
 	graficos->imprimir(indice, screen, &tmp, c*32, f*32, 1);
-	SDL_UpdateRect(screen, tmp.x, tmp.y, tmp.w, tmp.h);
 }
 
 /*!
@@ -272,7 +304,6 @@ void limpiar_bloque(SDL_Surface *screen, int f, int c)
 	tmp.y = f*32;
 	tmp.w = tmp.h = 32;
 	SDL_FillRect(screen, &tmp, SDL_MapRGB(screen->format, 80,80,80));
-	SDL_UpdateRect(screen, tmp.x, tmp.y, tmp.w, tmp.h);
 }
 
 /*!
@@ -307,7 +338,7 @@ void imprimir_todo(SDL_Surface *screen, char mapa[][20], grafico *graficos, graf
 	}
 
 	imprimir_barra(screen, graficos, panel, barra);
-	SDL_Flip(screen);
+	Ceferino_Flip(screen);
 }
 
 
@@ -445,7 +476,7 @@ int cargar_nivel(char mapa[][20], FILE *arch, int indice)
 	else
 	{
 		imprimir_error();
-		printf("\t error : Falló la lectura del archivo\n");
+		printf("\t error : Fall? la lectura del archivo\n");
 		return -1;
 	}
 }

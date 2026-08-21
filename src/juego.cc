@@ -1,17 +1,17 @@
-/*
- * Don Ceferino Hazaña - video game similary to Super Pang!
+ï»¿/*
+ * Don Ceferino Hazaï¿½a - video game similary to Super Pang!
  * Copyright (c) 2004, 2005 Hugo Ruscitti
  * web site: http://www.loosersjuegos.com.ar
  * 
- * This file is part of Don Ceferino Hazaña (ceferino).
+ * This file is part of Don Ceferino Hazaï¿½a (ceferino).
  * Written by Hugo Ruscitti <hugoruscitti@yahoo.com.ar>
  *
- * Don Ceferino Hazaña is free software; you can redistribute it and/or modify
+ * Don Ceferino Hazaï¿½a is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
  *
- * Don Ceferino Hazaña is distributed in the hope that it will be useful,
+ * Don Ceferino Hazaï¿½a is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -23,7 +23,7 @@
  */
 
 
-#include <SDL/SDL.h>
+#include <SDL2/SDL.h>
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
@@ -32,6 +32,7 @@
 #include "mundo.h"
 #include "utils.h"
 #include "int.h"
+#include "sdl2_compat.h"
 
 
 juego :: juego()
@@ -75,7 +76,7 @@ int juego :: iniciar(mundo *_pmundo, int _modo_video, SDL_Surface *_screen)
 	modo_video = _modo_video;
 	screen = _screen;
 	
-	fondo = SDL_DisplayFormat(_screen);
+	fondo = SDL_ConvertSurface(_screen, _screen->format, 0);
 
 	if (fondo == NULL)
 	{
@@ -133,7 +134,7 @@ int juego :: avanzar_nivel(void)
 	
 		SDL_FillRect(screen, NULL, 0);
 		SDL_FillRect(fondo, NULL, 0);
-		SDL_Flip(screen);
+		Ceferino_Flip(screen);
 
 		if (es_marca(puntos))
 		{
@@ -163,9 +164,9 @@ int juego :: avanzar_nivel(void)
 
 	SDL_BlitSurface(fondo, &rect, screen, &rect);
 	procesos->imprimir(screen, tmp, &tmp_contador);
-	SDL_UpdateRect(screen, rect.x, rect.y, rect.w, rect.h);
+	Ceferino_Flip(screen);
 	pmundo->reiniciar_reloj();
-	
+
 	return 0;
 }
 
@@ -176,9 +177,9 @@ int juego :: avanzar_nivel(void)
  */
 void juego :: actualizar(void)
 {
-	tecla = SDL_GetKeyState(NULL);
+	tecla = SDL_GetKeyboardState(NULL);
 
-	if (tecla[SDLK_ESCAPE] && estado != GUARDA_MARCA)
+	if (tecla[K(SDLK_ESCAPE)] && estado != GUARDA_MARCA)
 	{
 		pmundo->cambiar_escena(MENU);
 		return;
@@ -196,10 +197,10 @@ void juego :: actualizar(void)
 
 			/* cheats */
 			
-			if (tecla[SDLK_j] && tecla[SDLK_u]) // (ju)mp
+			if (tecla[K(SDLK_j)] && tecla[K(SDLK_u)]) // (ju)mp
 				pasa_nivel();
 
-			if (tecla[SDLK_s] && tecla[SDLK_j]) // (s)uper(j)mp
+			if (tecla[K(SDLK_s)] && tecla[K(SDLK_j)]) // (s)uper(j)mp
 			{
 				procesos->eliminar_todos();
 				nivel->ir_nivel(25);
@@ -271,7 +272,7 @@ void juego :: procesar_tiempo(void)
 
 
 /*!
- * \brief Realiza la impresion en pantalla utilizando la técnica Dirty Rectangles
+ * \brief Realiza la impresion en pantalla utilizando la tï¿½cnica Dirty Rectangles
  */
 void juego :: imprimir(void)
 {
@@ -295,8 +296,8 @@ void juego :: imprimir(void)
 	
 	copiar_rectangulos(todos, &lim_todos, rect_actual, &lim_actual, screen->w, screen->h);
 
-	SDL_UpdateRects(screen, lim_todos, todos);
-	
+	Ceferino_Flip(screen);
+
 	lim_todos=0;
 	copiar_rectangulos(todos, &lim_todos, rect_actual, &lim_actual, screen->w, screen->h);
 
@@ -331,7 +332,7 @@ void juego :: crear_gaucho(int x, int y)
  * 
  * \param x coordenada x
  * \param y coordenada y
- * \param tam tamaño de la pelota (4 muy grande, 3 grande, 2 mediana, 1 chica
+ * \param tam tamaï¿½o de la pelota (4 muy grande, 3 grande, 2 mediana, 1 chica
  * \param flip direccion de la pelota (1 derecha, -1 izquierda)
  */
 void juego :: crear_pelota(int x, int y, int tam, int flip)
@@ -525,7 +526,7 @@ void juego :: reiniciar_nivel(void)
 
 	SDL_BlitSurface(fondo, &rect, screen, &rect);
 	procesos->imprimir(screen, tmp, &tmp_contador);
-	SDL_UpdateRect(screen, rect.x, rect.y, rect.w, rect.h);
+	Ceferino_Flip(screen);
 	pmundo->reiniciar_reloj();
 }
 
@@ -579,13 +580,12 @@ void juego :: efecto_bomba(void)
 	SDL_Rect rect = {0, 0, screen->w, screen->h - screen->h/15};
 
 	SDL_FillRect(screen, &rect, SDL_MapRGB(screen->format,255,255,255));
-	SDL_UpdateRect(screen, rect.x, rect.y, rect.w, rect.h);
+	Ceferino_Flip(screen);
 
-	
 	// restaura la pantalla
 	SDL_BlitSurface(fondo, &rect, screen, &rect);
 	procesos->imprimir(screen, tmp, &tmp_contador);
-	SDL_UpdateRect(screen, rect.x, rect.y, rect.w, rect.h);
+	Ceferino_Flip(screen);
 	SDL_BlitSurface(fondo, &rect, screen, &rect);
 	barra->imprimir_todo();
 	pmundo->reiniciar_reloj();
@@ -598,7 +598,7 @@ void juego :: efecto_bomba(void)
 
 
 /*!
- * \brief genera un mensaje rápido con los segundos disponibles
+ * \brief genera un mensaje rï¿½pido con los segundos disponibles
  *
  * \param segundos tiempo restante
  */
@@ -651,7 +651,7 @@ void juego :: jugando(void)
 	}
 
 	
-	if (tecla[SDLK_p])
+	if (tecla[K(SDLK_p)])
 	{
 		cambiar_estado(PAUSA);
 		delay_tecla=20;
@@ -680,7 +680,7 @@ void juego :: pierde_vida(void)
 void juego :: pierde_todo(void)
 {
 
-	tecla = SDL_GetKeyState(NULL);
+	tecla = SDL_GetKeyboardState(NULL);
 
 	if (procesos->hay_mensaje_activo ())
 	{
@@ -688,13 +688,13 @@ void juego :: pierde_todo(void)
 	}
 	else
 	{
-		if (tecla[SDLK_ESCAPE])
+		if (tecla[K(SDLK_ESCAPE)])
 		{
 		    	pmundo->cambiar_escena(MENU);
 			return;
 		}
 
-		if (tecla [SDLK_SPACE])
+		if (tecla[K(SDLK_SPACE)])
 		{
 			puntos = 0;
 			vidas = 3;
@@ -790,37 +790,39 @@ void juego :: detenido_por_bomba(void)
  */
 void juego :: guarda_marca(void)
 {
-	Uint8 *key;
-	int i;
+	const Uint8 *key;
 	int lim = strlen(nombre);
 
 	if (delay_tecla==0)
 	{
-		key = SDL_GetKeyState(NULL);
+		key = SDL_GetKeyboardState(NULL);
 
 		// agrega letras
 		if (lim<17)
 		{
 			// letras
-			for (i=SDLK_a; i <= SDLK_z; i++)
 			{
-				if (key[i])
+				int sc;
+				for (sc=SDL_SCANCODE_A; sc <= SDL_SCANCODE_Z; sc++)
 				{
-					nombre[lim]=(char)i;
-					nombre[lim+1]='\0';
-					delay_tecla=15;
-					return;
+					if (key[sc])
+					{
+						nombre[lim]=(char)('a' + sc - SDL_SCANCODE_A);
+						nombre[lim+1]='\0';
+						delay_tecla=15;
+						return;
+					}
 				}
 			}
 
-			if (key[SDLK_SPACE])
+			if (key[K(SDLK_SPACE)])
 			{
 				nombre[lim]=' ';
 				nombre[lim+1]='\0';
 				delay_tecla=15;
 			}
 			
-			if (key[SDLK_ESCAPE])
+			if (key[K(SDLK_ESCAPE)])
 			{
 				pmundo->habilitar_letras();
 				
@@ -836,7 +838,7 @@ void juego :: guarda_marca(void)
 		}
 
 
-		if (key[SDLK_RETURN])
+		if (key[K(SDLK_RETURN)])
 		{
 			pmundo->habilitar_letras();
 
@@ -850,7 +852,7 @@ void juego :: guarda_marca(void)
 		}
 
 		
-		if (lim>0 && key[SDLK_BACKSPACE])
+		if (lim>0 && key[K(SDLK_BACKSPACE)])
 		{
 			nombre[lim-1]='\0';
 			delay_tecla=20;
@@ -875,13 +877,7 @@ int juego :: es_marca(int puntaje)
 	char ruta_completa[100];
 	struct entrada vec_marcas[7];
 
-#ifdef WIN32
-	strcpy(ruta_completa, "marcas.dat");
-#else
-	strcpy(ruta_completa, getenv("HOME"));
-	strcat(ruta_completa, "/");
-	strcat(ruta_completa, ".ceferinomarcas");
-#endif
+	ceferino_config_path(ruta_completa, sizeof(ruta_completa), "marcas.dat");
 
 	arch = fopen(ruta_completa, "rb");
 
@@ -919,7 +915,6 @@ void juego :: imprimir_marca(SDL_Surface *screen, SDL_Rect *rect_actual, int *li
 {
 	char mensaje1[200];
 	char mensaje2[200];
-	int i;
 
 	strcpy(mensaje1, _("you made a new record"));
 	strcpy(mensaje2, _("enter your name"));
@@ -957,13 +952,7 @@ void juego :: salvar_marca_en_archivo(void)
 	int i;
 	int pos=6;
 
-#ifdef WIN32
-	strcpy(ruta_completa, "marcas.dat");
-#else
-	strcpy(ruta_completa, getenv("HOME"));
-	strcat(ruta_completa, "/");
-	strcat(ruta_completa, ".ceferinomarcas");
-#endif
+	ceferino_config_path(ruta_completa, sizeof(ruta_completa), "marcas.dat");
 	
 	arch = fopen(ruta_completa, "rb+");
 
@@ -1006,7 +995,7 @@ void juego :: salvar_marca_en_archivo(void)
  */
 void juego :: pausa(void)
 {
-	if (tecla[SDLK_SPACE] || tecla[SDLK_z] || tecla[SDLK_x] || tecla[SDLK_c] || tecla[SDLK_RETURN])
+	if (tecla[K(SDLK_SPACE)] || tecla[K(SDLK_z)] || tecla[K(SDLK_x)] || tecla[K(SDLK_c)] || tecla[K(SDLK_RETURN)])
 	{
 		reiniciar_reloj_local();
 		cambiar_estado(JUGANDO);
@@ -1042,8 +1031,6 @@ void juego :: pausar(void)
  */
 void juego :: imprime_pierde_todo (SDL_Surface *screen, SDL_Rect *rect_actual, int *lim_actual)
 {
-	char mensaje[200];
-
 	pmundo->fuente->myprintf (screen, 320, 100, rect_actual, lim_actual, \
 			false, CENTRADO, _("Game Over"));
 	

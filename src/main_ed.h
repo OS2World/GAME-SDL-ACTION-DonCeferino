@@ -1,17 +1,17 @@
-/*
- * Don Ceferino Hazaña - video game similary to Super Pang!
+ï»¿/*
+ * Don Ceferino Hazaï¿½a - video game similary to Super Pang!
  * Copyright (c) 2004, 2005 Hugo Ruscitti
  * web site: http://www.loosersjuegos.com.ar
  * 
- * This file is part of Don Ceferino Hazaña (ceferino).
+ * This file is part of Don Ceferino Hazaï¿½a (ceferino).
  * Written by Hugo Ruscitti <hugoruscitti@yahoo.com.ar>
  *
- * Don Ceferino Hazaña is free software; you can redistribute it and/or modify
+ * Don Ceferino Hazaï¿½a is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
  *
- * Don Ceferino Hazaña is distributed in the hope that it will be useful,
+ * Don Ceferino Hazaï¿½a is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -24,8 +24,8 @@
 #ifndef _MAIN_ED_H
 #define _MAIN_ED_H
 
-#include <SDL/SDL.h>
-#include <SDL/SDL_image.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 
 struct mouse
 {
@@ -55,7 +55,7 @@ void imprimir_bloque(SDL_Surface *screen, grafico *graficos, int f, int c, int i
 void limpiar_bloque(SDL_Surface *screen, int f, int c);
 void imprimir_todo(SDL_Surface *screen, char mapa[][20], grafico *graficos, grafico *panel, struct barra *barra);
 void mover_barra(SDL_Surface *screen, grafico *graficos, grafico *panel, struct barra *barra, int inc);
-void seleccionar_barra(SDL_Surface *screen, struct mouse *mouse, struct barra *barra, grafico *graficos, grafico *panel, char mapa[][20], grafico *bloques, int *salir);
+void seleccionar_barra(SDL_Surface *screen, struct mouse *mouse, struct barra *barra, grafico *bloques, grafico *panel, char mapa[][20], FILE *arch, int *salir);
 int cargar_nivel(char mapa[][20], FILE *arch, int indice);
 void guardar_nivel(char mapa[][20], FILE *arch, int indice);
 void ir_nivel_anterior(char mapa[][20], FILE *arch, int *nivel);

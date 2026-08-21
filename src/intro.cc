@@ -1,17 +1,17 @@
 /*
- * Don Ceferino Hazaña - video game similary to Super Pang!
+ * Don Ceferino Hazaï¿½a - video game similary to Super Pang!
  * Copyright (c) 2004, 2005 Hugo Ruscitti
  * web site: http://www.loosersjuegos.com.ar
  * 
- * This file is part of Don Ceferino Hazaña (ceferino).
+ * This file is part of Don Ceferino Hazaï¿½a (ceferino).
  * Written by Hugo Ruscitti <hugoruscitti@yahoo.com.ar>
  *
- * Don Ceferino Hazaña is free software; you can redistribute it and/or modify
+ * Don Ceferino Hazaï¿½a is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
  *
- * Don Ceferino Hazaña is distributed in the hope that it will be useful,
+ * Don Ceferino Hazaï¿½a is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -23,8 +23,8 @@
  */
 
 
-#include <SDL/SDL.h>
-#include <SDL/SDL_image.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 #include <string.h>
 #include "intro.h"
 #include "mundo.h"
@@ -51,7 +51,7 @@ intro :: ~intro(void)
 }
 
 /*!
- * \brief carga las pantalla de la animación e inicia el objeto
+ * \brief carga las pantalla de la animaciï¿½n e inicia el objeto
  */
 int intro :: iniciar(class mundo *_pmundo, int _modo_video, SDL_Surface *_screen)
 {
@@ -111,21 +111,21 @@ int intro :: iniciar(class mundo *_pmundo, int _modo_video, SDL_Surface *_screen
 	cambiar_etapa(PRESENTA);
 	imprimir_etapa(etapa);
 
-	fondo = SDL_DisplayFormat(screen);
+	fondo = SDL_ConvertSurface(screen, screen->format, 0);
 	return 0;
 }
 
 /*!
- * \brief actualización lógica
+ * \brief actualizaciï¿½n lï¿½gica
  */
 void intro :: actualizar(void)
 {
-	Uint8 *tecla;
+	const Uint8 *tecla;
 
-	tecla = SDL_GetKeyState(NULL);
+	tecla = SDL_GetKeyboardState(NULL);
 
 
-	/* avance automático */
+	/* avance automï¿½tico */
 	if (paso > 1000)
 	{
 		avanzar_etapa ();
@@ -133,7 +133,7 @@ void intro :: actualizar(void)
 	}
 
 	/* avance con Space o Esc */
-	if (paso > 100 && (tecla[SDLK_SPACE] || tecla[SDLK_RETURN]))
+	if (paso > 100 && (tecla[K(SDLK_SPACE)] || tecla[K(SDLK_RETURN)]))
 	{
 		avanzar_etapa ();
 		paso = 0;
@@ -142,7 +142,7 @@ void intro :: actualizar(void)
 	paso ++;
 	
 	
-	if (tecla[SDLK_ESCAPE])
+	if (tecla[K(SDLK_ESCAPE)])
 	{
 		pmundo->audio.play(5);
 		pmundo->cambiar_escena(MENU);
@@ -171,7 +171,7 @@ void intro :: imprimir_etapa(int etapa)
 {
 	SDL_BlitSurface(imas[etapa], NULL, screen, NULL);
 	imprimir_texto ();
-	SDL_Flip(screen);
+	Ceferino_Flip(screen);
 }
 
 
@@ -282,7 +282,6 @@ void intro :: imprimir_caracter(char letra, int x, int y, int resaltar)
 			break;
 	}
 
-	SDL_UpdateRect(screen, rect.x, rect.y, rect.w, rect.h);
 	*/
 }
 

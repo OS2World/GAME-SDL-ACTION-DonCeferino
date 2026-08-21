@@ -1,17 +1,17 @@
 /*
- * Don Ceferino Hazaña - video game similary to Super Pang!
+ * Don Ceferino Hazaï¿½a - video game similary to Super Pang!
  * Copyright (c) 2004, 2005 Hugo Ruscitti
  * web site: http://www.loosersjuegos.com.ar
  * 
- * This file is part of Don Ceferino Hazaña (ceferino).
+ * This file is part of Don Ceferino Hazaï¿½a (ceferino).
  * Written by Hugo Ruscitti <hugoruscitti@yahoo.com.ar>
  *
- * Don Ceferino Hazaña is free software; you can redistribute it and/or modify
+ * Don Ceferino Hazaï¿½a is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
  *
- * Don Ceferino Hazaña is distributed in the hope that it will be useful,
+ * Don Ceferino Hazaï¿½a is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -23,7 +23,7 @@
  */
 
 
-#include <SDL/SDL.h>
+#include <SDL2/SDL.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -34,6 +34,7 @@
 #include "grafico.h"
 #include "utils.h"
 #include "int.h"
+#include "sdl2_compat.h"
 
 marcas :: marcas(void)
 {
@@ -58,7 +59,7 @@ int marcas :: iniciar(class mundo *_pmundo, int _mvideo, SDL_Surface *_screen)
 	modo_video = _mvideo;
 	screen = _screen;
 
-	fondo = SDL_DisplayFormat(screen);
+	fondo = SDL_ConvertSurface(screen, screen->format, 0);
 
 	if (fondo == NULL)
 	{
@@ -71,20 +72,20 @@ int marcas :: iniciar(class mundo *_pmundo, int _mvideo, SDL_Surface *_screen)
 	pmundo->libgrafico.ima_menu->imprimir(0, fondo, &rect, 0, 0, 1);
 	SDL_BlitSurface(fondo, NULL, screen, NULL);
 	imprimir_puntajes ();
-	SDL_Flip(screen);
+	Ceferino_Flip(screen);
 	return 0;
 }
 
 /*!
- * \brief actualización lógica
+ * \brief actualizaciï¿½n lï¿½gica
  */
 void marcas :: actualizar(void)
 {
-	Uint8 *tecla;
+	const Uint8 *tecla;
 	
-	tecla = SDL_GetKeyState(NULL);
+	tecla = SDL_GetKeyboardState(NULL);
 
-	if (tecla[SDLK_ESCAPE])
+	if (tecla[K(SDLK_ESCAPE)])
 	{
 		pmundo->cambiar_escena(MENU);
 		pmundo->audio.play(4);
@@ -134,13 +135,7 @@ void marcas :: cargar_marcas(void)
 	FILE *arch;
 	char ruta_completa[100];
 
-#ifdef WIN32
-	strcpy(ruta_completa, "marcas.dat");
-#else
-	strcpy(ruta_completa, getenv("HOME"));
-	strcat(ruta_completa, "/");
-	strcat(ruta_completa, ".ceferinomarcas");
-#endif
+	ceferino_config_path(ruta_completa, sizeof(ruta_completa), "marcas.dat");
 
 	arch = fopen(ruta_completa, "rb");
 

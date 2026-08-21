@@ -27,7 +27,7 @@
 enum {INICIAL, WEB, GPL};
 
 
-#include <SDL/SDL.h>
+#include <SDL2/SDL.h>
 #include <string.h>
 
 #include "menu.h"
@@ -70,7 +70,7 @@ int creditos :: iniciar(class mundo *_pmundo, int _modo_video, SDL_Surface *_scr
 	modo_video = _modo_video;
 	screen = _screen;
 
-	fondo = SDL_DisplayFormat(screen);
+	fondo = SDL_ConvertSurface(screen, screen->format, 0);
 
 	if (fondo == NULL)
 	{
@@ -84,7 +84,7 @@ int creditos :: iniciar(class mundo *_pmundo, int _modo_video, SDL_Surface *_scr
 	cambiar_etapa(INICIAL);
 	imprimir_etapa ();
 	
-	SDL_Flip(screen);
+	Ceferino_Flip(screen);
 	return 0;
 }
 
@@ -94,17 +94,17 @@ int creditos :: iniciar(class mundo *_pmundo, int _modo_video, SDL_Surface *_scr
  */
 void creditos :: actualizar(void)
 {
-	Uint8 * tecla;
+	const Uint8 *tecla;
 	
-	tecla = SDL_GetKeyState(NULL);
+	tecla = SDL_GetKeyboardState(NULL);
 
-	if (tecla [SDLK_ESCAPE])
+	if (tecla[K(SDLK_ESCAPE)])
 	{
 		pmundo->audio.play (4);
 		pmundo->cambiar_escena (MENU);
 	}
 
-	if (tecla [SDLK_SPACE] && delay == 0)
+	if (tecla[K(SDLK_SPACE)] && delay == 0)
 	{
 		delay = 100;
 			
@@ -126,7 +126,7 @@ void creditos :: actualizar(void)
 			SDL_BlitSurface (fondo, NULL, screen, NULL);
 			
 			imprimir_etapa ();
-			SDL_Flip (screen);
+			Ceferino_Flip(screen);
 		}
 	}
 	
@@ -155,7 +155,7 @@ void creditos :: imprimir_etapa (void)
 			mensaje);
 	
 	imprimir_pie ();
-	SDL_Flip (screen);	
+	Ceferino_Flip(screen);	
 }
 
 

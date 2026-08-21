@@ -1,17 +1,16 @@
 /*
- * Don Ceferino Hazaña - video game similary to Super Pang!
+ * Don Ceferino Hazana - video game similary to Super Pang!
  * Copyright (c) 2004, 2005 Hugo Ruscitti
  * web site: http://www.loosersjuegos.com.ar
- * 
- * This file is part of Don Ceferino Hazaña (ceferino).
- * Written by Hugo Ruscitti <hugoruscitti@yahoo.com.ar>
  *
- * Don Ceferino Hazaña is free software; you can redistribute it and/or modify
+ * This file is part of Don Ceferino Hazana (ceferino).
+ *
+ * Don Ceferino Hazana is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
  *
- * Don Ceferino Hazaña is distributed in the hope that it will be useful,
+ * Don Ceferino Hazana is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -19,22 +18,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * 
  */
 
 
-#include <SDL/SDL.h>
-#include <SDL/SDL_image.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 #include "mundo.h"
+#include "sdl2_compat.h"
 #include "utils.h"
 #include "opciones.h"
 #include "int.h"
 
 #ifdef HAVE_CONFIG_H
-	#include "../config.h"
+	#include "config.h"
 #endif
 
 mundo :: mundo()
@@ -46,14 +45,15 @@ mundo :: mundo()
 
 
 /*!
- * \brief inicializa la biblioteca y los recursos básicos
+ * \brief inicializa la biblioteca y los recursos basicos
  *
  * \return 1 en caso de error
  */
 int mundo :: iniciar (void)
 {
-	int flags=0;
 	SDL_Surface *ico;
+	int screenW, screenH, winW, winH;
+	Uint32 winFlags;
 
 	printf(_("+ Starting the SDL library:"));
 
@@ -63,48 +63,71 @@ int mundo :: iniciar (void)
 		printf("error: %s\n", SDL_GetError());
 		return 1;
 	}
-	
+
 	imprimir_ok();
 
-#ifndef WIN32
-	flags = SDL_HWSURFACE | SDL_DOUBLEBUF;
-#else
-	// fullscreen bugfix
-	flags = SDL_SWSURFACE;
-#endif
-	
+	screenW = (opciones.modo_video == 0) ? 640 : 320;
+	screenH = (opciones.modo_video == 0) ? 480 : 240;
+	winW    = (screenW < 1024) ? 1024 : screenW;
+	winH    = (screenH < 768)  ? 768  : screenH;
+
+	winFlags = SDL_WINDOW_RESIZABLE;
 	if (opciones.pantalla_completa)
-		flags |= SDL_FULLSCREEN;
+		winFlags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
 
-	if (opciones.modo_video == 0)
-		screen = SDL_SetVideoMode(640, 480, 16,  flags);
-	else
-		screen = SDL_SetVideoMode(320, 240, 16,  flags);
-
-	fuente = new fuente2 (opciones.modo_video);
-
-	
-	if (screen == NULL)
+	g_window = SDL_CreateWindow("Don Ceferino Hazana - ver " VERSION,
+		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+		winW, winH, winFlags);
+	if (!g_window)
 	{
 		printf("error: %s\n", SDL_GetError());
 		return 1;
 	}
 
+	g_renderer = SDL_CreateRenderer(g_window, -1, SDL_RENDERER_ACCELERATED);
+	if (!g_renderer)
+		g_renderer = SDL_CreateRenderer(g_window, -1, 0);
+	if (!g_renderer)
+	{
+		printf("error: %s\n", SDL_GetError());
+		return 1;
+	}
+
+	SDL_RenderSetLogicalSize(g_renderer, screenW, screenH);
+
+	screen = SDL_CreateRGBSurface(0, screenW, screenH, 32,
+		0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
+	if (!screen)
+	{
+		printf("error: %s\n", SDL_GetError());
+		return 1;
+	}
+
+	g_screen_texture = SDL_CreateTexture(g_renderer,
+		SDL_PIXELFORMAT_ARGB8888,
+		SDL_TEXTUREACCESS_STREAMING, screenW, screenH);
+	if (!g_screen_texture)
+	{
+		printf("error: %s\n", SDL_GetError());
+		return 1;
+	}
+
+	fuente = new fuente2 (opciones.modo_video);
+
 	ico = IMG_Load (DATADIR "/ima/icono.png");
-		
+
 	SDL_ShowCursor(SDL_DISABLE);
-	SDL_WM_SetCaption("Don Ceferino Hazaña - ver " VERSION, NULL);
-	
+
 	if (ico)
 	{
-		SDL_WM_SetIcon(ico, NULL);
+		SDL_SetWindowIcon(g_window, ico);
 		SDL_FreeSurface(ico);
 	}
 
 	imprimir_cargando();
-	
+
 	libgrafico.iniciar(opciones.modo_video);
-	
+
 	audio.iniciar(opciones.sonido, opciones.musica);
 
 	escena_anterior=-1;
@@ -131,9 +154,8 @@ void mundo :: correr (void)
 	SDL_Event evento;
 	int fps=0;
 	int log=0;
-	int tframe = -100; // tick del último fps actualizado
 	int rep, i;
-	
+
 	#define TICK_POR_LOGICO (1000/100)
 	#define TICK_POR_FRAME (1000/100)
 
@@ -144,21 +166,11 @@ void mundo :: correr (void)
 		if (escena != escena_anterior)
 			intercambiar_escenas();
 
-		
+
 		salir = procesar_eventos(&evento);
 		t = SDL_GetTicks();
 
-		/*
-		if (t - tframe > 1000)	// cuadros por segundo
-		{
-//			printf("----------\nfps %d\nlogicos %d\n", fps, log);
-			tframe = t;
-			fps=0;
-			log=0;
-		}
-		*/
-		
-		if (t - tl > TICK_POR_LOGICO)	// lógica
+		if (t - tl > TICK_POR_LOGICO)
 		{
 			rep = (t - tl) / TICK_POR_LOGICO;
 
@@ -168,7 +180,7 @@ void mundo :: correr (void)
 			tl+=rep*TICK_POR_LOGICO;
 			log+=rep;
 
-			if (t - tg > TICK_POR_FRAME)	// grafica
+			if (t - tg > TICK_POR_FRAME)
 			{
 				actual->imprimir();
 				fps++;
@@ -178,7 +190,7 @@ void mundo :: correr (void)
 		}
 		else
 			SDL_Delay(TICK_POR_LOGICO - (t-tl));
-		
+
 
 	}
 }
@@ -186,7 +198,7 @@ void mundo :: correr (void)
 
 /*!
  * \brief atiende los eventos de la ventana
- * 
+ *
  * \return 1 si la aplicacion debe terminar
  */
 int mundo :: procesar_eventos(SDL_Event *evento)
@@ -198,32 +210,45 @@ int mundo :: procesar_eventos(SDL_Event *evento)
 			case SDL_QUIT:
 				return 1;
 				break;
-				
+
 			case SDL_KEYDOWN:
-				
+
+				/* Ctrl+X: exit immediately */
+				if (evento->key.keysym.sym == SDLK_x &&
+					(evento->key.keysym.mod & KMOD_CTRL))
+				{
+					return 1;
+				}
+
+				/* Alt+Enter: toggle fullscreen */
+				if (evento->key.keysym.sym == SDLK_RETURN &&
+					(evento->key.keysym.mod & KMOD_ALT))
+				{
+					Ceferino_ToggleFullscreen();
+					reiniciar_reloj();
+					break;
+				}
+
 				if (leer_teclas)
 				{
 					if (evento->key.keysym.sym == SDLK_f)
 					{
-						SDL_WM_ToggleFullScreen(screen);
+						Ceferino_ToggleFullscreen();
 						reiniciar_reloj();
 					}
 				}
 				break;
 
-			case SDL_ACTIVEEVENT:
-				
-				if (evento->active.state == SDL_APPINPUTFOCUS)
+			case SDL_WINDOWEVENT:
+				if (evento->window.event == SDL_WINDOWEVENT_FOCUS_LOST)
 				{
-					if (! evento->active.gain)
+					if (actual)
 						actual->pausar();
 				}
-					
-						
 				break;
 		}
 	}
-	
+
 	return 0;
 }
 
@@ -243,8 +268,11 @@ void mundo :: eliminar(void)
 {
 	if (actual)
 		delete actual;
-	
+
 	SDL_FreeSurface(screen);
+	SDL_DestroyTexture(g_screen_texture);
+	SDL_DestroyRenderer(g_renderer);
+	SDL_DestroyWindow(g_window);
 	SDL_Quit();
 }
 
@@ -257,15 +285,15 @@ int mundo :: cargar_opciones(char *ruta)
 {
 	FILE *arch;
 	char buffer[200];
-	char ruta_completa[100];
-	
+	char ruta_completa[512];
+
 	char *nombre;
 	char *valor;
-	
+
 	char etiquetas[4][20] = {"musica", "sonido", "pantalla_completa", "modo_video"};
 	int *registros[4];
 	int num_opciones=4;
-	
+
 	int i;
 	int tmp_encuentra;
 
@@ -274,34 +302,28 @@ int mundo :: cargar_opciones(char *ruta)
 	registros[2] = &(opciones.pantalla_completa);
 	registros[3] = &(opciones.modo_video);
 
-#ifdef WIN32
-	strcpy(ruta_completa, "opciones.txt");
-#else
-	strcpy(ruta_completa, getenv("HOME"));
-	strcat(ruta_completa, "/");
-	strcat(ruta_completa, ruta);
-#endif
+	ceferino_config_path(ruta_completa, sizeof(ruta_completa), "ceferino.cfg");
 
 	if ((arch = fopen(ruta_completa, "rt")) == NULL)
 	{
-		printf(_("It doesn't exist the configuration file '%s',"\
-					"execute 'ceferinosetup':\n"),\
+		printf(_("It doesn't exist the configuration file '%s',"
+					"execute 'ceferinosetup':\n"),
 					ruta_completa);
 		opciones.musica=1;
 		opciones.sonido=1;
 		opciones.pantalla_completa=0;
 		opciones.modo_video=0;
-		
+
 		return 0;
 	}
-	
+
 	while (fgets(buffer, 200, arch))
 	{
 		if (buffer[0] != '#' && buffer[0] != '\n')
 		{
 			nombre = strtok(buffer, "=");
 			valor = strtok(NULL, " =;\n#");
-			
+
 			tmp_encuentra = 0;
 
 			for (i=0; i< num_opciones; i++)
@@ -312,16 +334,13 @@ int mundo :: cargar_opciones(char *ruta)
 					*(registros[i]) = atoi(valor);
 				}
 			}
-			
+
 			if (tmp_encuentra == 0)
 			{
-				printf(_("Incorrect '%s' parameter\n"),\
-						nombre);
+				printf(_("Incorrect '%s' parameter\n"), nombre);
 				fclose(arch);
 				return 1;
 			}
-
-			
 		}
 	}
 
@@ -331,7 +350,7 @@ int mundo :: cargar_opciones(char *ruta)
 
 
 /*!
- * \brief reinicia los contadores de tiempo, por ejemplo para evitar saltos luego de cargar imagenes
+ * \brief reinicia los contadores de tiempo
  */
 void mundo :: reiniciar_reloj(void)
 {
@@ -346,7 +365,7 @@ void mundo :: intercambiar_escenas(void)
 {
 	if (actual)
 		delete actual;
-	
+
 	switch (escena)
 	{
 		case INTRO:
@@ -360,11 +379,11 @@ void mundo :: intercambiar_escenas(void)
 		case JUEGO:
 			actual = new class juego;
 			break;
-			
+
 		case CREDITOS:
 			actual = new class creditos;
 			break;
-			
+
 		case MARCAS:
 			actual = new class marcas;
 			break;
@@ -387,10 +406,10 @@ void mundo :: intercambiar_escenas(void)
 		printf(_("Error at changing scene\n"));
 		terminar();
 	}
-	
+
 	escena_anterior = escena;
 	reiniciar_reloj();
-	
+
 }
 
 /*!
@@ -422,12 +441,12 @@ void mundo :: imprimir_cargando (void)
 	if (ima)
 	{
 		SDL_BlitSurface(ima, NULL, screen, NULL);
-		SDL_Flip(screen);
+		SDL_FreeSurface(ima);
+		Ceferino_Flip(screen);
 	}
 	else
 	{
-		printf(_("Can't find the file '%s'\n"), DATADIR\
-				"/ima/cargando.png");
+		printf(_("Can't find the file '%s'\n"), DATADIR "/ima/cargando.png");
 	}
 }
 

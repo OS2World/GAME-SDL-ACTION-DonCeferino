@@ -1,0 +1,80 @@
+CC  = gcc
+CXX = g++
+
+PACKAGE  = ceferino
+VERSION  = 1.0.0-os2
+DATADIR  = data
+
+CXXFLAGS = -I/@unixroot/usr/include/SDL2 \
+           -I/@unixroot/usr/include \
+           -I. \
+           -Isrc \
+           -D__OS2__ \
+           -DHAVE_CONFIG_H \
+           -DDATADIR=\"$(DATADIR)\" \
+           -DPACKAGE=\"$(PACKAGE)\" \
+           -DVERSION=\"$(VERSION)\" \
+           -O2 -Wall -Wno-write-strings
+
+LDFLAGS  = -Zhigh-mem -Zmap -Zomf
+LIBS     = -lSDL2 -lSDL2_image -lSDL2_mixer -lm
+
+SRCS = \
+	src/actor.cc \
+	src/audio.cc \
+	src/barra.cc \
+	src/bloque.cc \
+	src/bomba.cc \
+	src/comojugar.cc \
+	src/creditos.cc \
+	src/final.cc \
+	src/fuente.cc \
+	src/fuente2.cc \
+	src/gaucho.cc \
+	src/grafico.cc \
+	src/intro.cc \
+	src/item.cc \
+	src/item_menu.cc \
+	src/juego.cc \
+	src/libgrafico.cc \
+	src/main.cc \
+	src/marcas.cc \
+	src/menu.cc \
+	src/mundo.cc \
+	src/nivel.cc \
+	src/opciones.cc \
+	src/pelota.cc \
+	src/procesos.cc \
+	src/sdl2_compat.cc \
+	src/simple_sprite.cc \
+	src/tiro.cc \
+	src/utils.cc
+
+OBJS = $(SRCS:.cc=.obj)
+
+TARGET  = ceferino.exe
+TARGET2 = ceferinoeditor.exe
+TARGET3 = ceferinosetup.exe
+
+OBJS2 = src/main_ed.obj src/grafico.obj src/utils.obj src/sdl2_compat.obj
+OBJS3 = src/main_op.obj src/sdl2_compat.obj
+
+all: $(TARGET) $(TARGET2) $(TARGET3)
+
+$(TARGET): $(OBJS) src/ceferino.def
+	$(CXX) $(LDFLAGS) -o $@ $(OBJS) $(LIBS) src/ceferino.def
+
+$(TARGET2): $(OBJS2) src/ceferinoeditor.def
+	$(CXX) $(LDFLAGS) -o $@ $(OBJS2) $(LIBS) src/ceferinoeditor.def
+
+$(TARGET3): $(OBJS3) src/ceferinosetup.def
+	$(CXX) $(LDFLAGS) -o $@ $(OBJS3) $(LIBS) src/ceferinosetup.def
+
+%.obj: %.cc
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+clean:
+	rm -f $(OBJS) $(OBJS2) $(OBJS3) $(TARGET) $(TARGET2) $(TARGET3) \
+	      $(TARGET:.exe=.map) $(TARGET2:.exe=.map) $(TARGET3:.exe=.map)
+
+.PHONY: all clean

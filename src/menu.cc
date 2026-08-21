@@ -1,17 +1,17 @@
-/*
- * Don Ceferino Hazaña - video game similary to Super Pang!
+ï»¿/*
+ * Don Ceferino Hazaï¿½a - video game similary to Super Pang!
  * Copyright (c) 2004, 2005 Hugo Ruscitti
  * web site: http://www.loosersjuegos.com.ar
  * 
- * This file is part of Don Ceferino Hazaña (ceferino).
+ * This file is part of Don Ceferino Hazaï¿½a (ceferino).
  * Written by Hugo Ruscitti <hugoruscitti@yahoo.com.ar>
  *
- * Don Ceferino Hazaña is free software; you can redistribute it and/or modify
+ * Don Ceferino Hazaï¿½a is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
  *
- * Don Ceferino Hazaña is distributed in the hope that it will be useful,
+ * Don Ceferino Hazaï¿½a is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -23,7 +23,7 @@
  */
 
 
-#include <SDL/SDL.h>
+#include <SDL2/SDL.h>
 #include "menu.h"
 #include "mundo.h"
 #include "grafico.h"
@@ -66,7 +66,7 @@ int menu :: iniciar(class mundo *_pmundo, int _modo_video, SDL_Surface *_screen)
 	modo_video = _modo_video;
 	screen = _screen;
 
-	fondo = SDL_DisplayFormat (_screen);
+	fondo = SDL_ConvertSurface(_screen, _screen->format, 0);
 
 	if (fondo == NULL)
 	{
@@ -103,7 +103,7 @@ int menu :: iniciar(class mundo *_pmundo, int _modo_video, SDL_Surface *_screen)
 	pmundo->libgrafico.ima_menu->imprimir(0, screen, &rect, 0, 0, 1);
 	pmundo->libgrafico.ima_menu->imprimir(0, fondo, &rect, 0, 0, 1);
 	
-	SDL_Flip(screen);
+	Ceferino_Flip(screen);
 
 	pmundo->audio.play_musica(1);
 	pmundo->reiniciar_reloj();
@@ -117,12 +117,12 @@ int menu :: iniciar(class mundo *_pmundo, int _modo_video, SDL_Surface *_screen)
 void menu :: actualizar(void)
 {
 
-	if (termino_titulo ()) // terminó la animación del titulo
+	if (termino_titulo ()) // terminï¿½ la animaciï¿½n del titulo
 	{
 		for (int i = 0; i < 6; i ++)
 			item_menu [i]->actualizar ();
 
-		tecla = SDL_GetKeyState(NULL);
+		tecla = SDL_GetKeyboardState(NULL);
 
 		// mover el cursor
 		if (down() && tecla_pulsada == 0)
@@ -245,8 +245,8 @@ void menu :: imprimir(void)
 
 	copiar_rectangulos(rect_todos, &lim_todos, rect_actual, &lim_actual, \
 			screen->w, screen->h);
-	
-	SDL_UpdateRects(screen, lim_todos, rect_todos);
+
+	Ceferino_Flip(screen);
 
 	lim_todos = 0;
 	
@@ -265,7 +265,7 @@ void menu :: imprimir(void)
 
 
 /*!
- * \brief informa si la animacion del titulo 'Don Ceferino...' terminó
+ * \brief informa si la animacion del titulo 'Don Ceferino...' terminï¿½
  * 
  * \return 1 si termino, 0 en caso contrario
  */
@@ -289,15 +289,15 @@ void menu :: pausar(void)
 
 bool menu :: shot(void)
 {
-    return tecla[SDLK_RETURN] or tecla[SDLK_SPACE] or tecla[SDLK_x] or tecla[SDLK_2];
+    return tecla[K(SDLK_RETURN)] or tecla[K(SDLK_SPACE)] or tecla[K(SDLK_x)] or tecla[K(SDLK_2)];
 }
 
 bool menu :: up(void)
 {
-    return tecla[SDLK_UP] or tecla[SDLK_k] or tecla[SDLK_w];
+    return tecla[K(SDLK_UP)] or tecla[K(SDLK_k)] or tecla[K(SDLK_w)];
 }
 
 bool menu :: down(void)
 {
-    return tecla[SDLK_DOWN] or tecla[SDLK_j] or tecla[SDLK_s];
+    return tecla[K(SDLK_DOWN)] or tecla[K(SDLK_j)] or tecla[K(SDLK_s)];
 }

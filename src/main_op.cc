@@ -1,17 +1,17 @@
 /*
- * Don Ceferino Hazaña - video game similary to Super Pang!
+ * Don Ceferino Hazaï¿½a - video game similary to Super Pang!
  * Copyright (c) 2004, 2005 Hugo Ruscitti
  * web site: http://www.loosersjuegos.com.ar
  * 
- * This file is part of Don Ceferino Hazaña (ceferino).
+ * This file is part of Don Ceferino Hazaï¿½a (ceferino).
  * Written by Hugo Ruscitti <hugoruscitti@yahoo.com.ar>
  *
- * Don Ceferino Hazaña is free software; you can redistribute it and/or modify
+ * Don Ceferino Hazaï¿½a is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
  *
- * Don Ceferino Hazaña is distributed in the hope that it will be useful,
+ * Don Ceferino Hazaï¿½a is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -23,12 +23,13 @@
  */
 
 
-#include <SDL/SDL.h>
-#include <SDL/SDL_image.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include "main_op.h"
+#include "sdl2_compat.h"
 
 
 /*!
@@ -79,6 +80,9 @@ int main (int argc, char * argv [])
 	SDL_FreeSurface(screen);
 	SDL_FreeSurface(fondo);
 	SDL_FreeSurface(items);
+	SDL_DestroyTexture(g_screen_texture);
+	SDL_DestroyRenderer(g_renderer);
+	SDL_DestroyWindow(g_window);
 	SDL_Quit();
 	return 0;
 }
@@ -98,33 +102,57 @@ int iniciar(SDL_Surface **screen, SDL_Surface **fondo, SDL_Surface **items)
 		return 1;
 	}
 
-	*screen = SDL_SetVideoMode(320, 240, 16,  SDL_HWSURFACE);
-
-	if (*screen == NULL)
+	g_window = SDL_CreateWindow(
+		"Menu de Opciones - Don Ceferino Hazana",
+		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+		320, 240, SDL_WINDOW_RESIZABLE);
+	if (!g_window)
 	{
 		printf("error: %s\n", SDL_GetError());
 		return 1;
 	}
 
-	*fondo = IMG_Load (DATADIR "/ima/fondo.jpg");
+	g_renderer = SDL_CreateRenderer(g_window, -1, SDL_RENDERER_ACCELERATED);
+	if (!g_renderer)
+		g_renderer = SDL_CreateRenderer(g_window, -1, 0);
+	if (!g_renderer)
+	{
+		printf("error: %s\n", SDL_GetError());
+		return 1;
+	}
 
+	SDL_RenderSetLogicalSize(g_renderer, 320, 240);
+
+	*screen = SDL_CreateRGBSurface(0, 320, 240, 32,
+		0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
+	if (!*screen)
+	{
+		printf("error: %s\n", SDL_GetError());
+		return 1;
+	}
+
+	g_screen_texture = SDL_CreateTexture(g_renderer, SDL_PIXELFORMAT_ARGB8888,
+		SDL_TEXTUREACCESS_STREAMING, 320, 240);
+	if (!g_screen_texture)
+	{
+		printf("error: %s\n", SDL_GetError());
+		return 1;
+	}
+
+	*fondo = IMG_Load(DATADIR "/ima/fondo.jpg");
 	if (*fondo == NULL)
 	{
-		printf("error: no se encuentra la imagen '" DATADIR\
-				"/ima/fondo.jpg'\n");
+		printf("error: no se encuentra la imagen '" DATADIR "/ima/fondo.jpg'\n");
 		return 1;
 	}
-	
-	*items = IMG_Load (DATADIR "/ima/op_items.png");
 
+	*items = IMG_Load(DATADIR "/ima/op_items.png");
 	if (*items == NULL)
 	{
-		printf("error: no se encuentra la imagen '" DATADIR\
-				"/ima/op_items.png'\n");
+		printf("error: no se encuentra la imagen '" DATADIR "/ima/op_items.png'\n");
 		return 1;
 	}
 
-	SDL_WM_SetCaption("Menu de Opciones - Losers", NULL);
 	SDL_ShowCursor(SDL_DISABLE);
 	return 0;
 }
@@ -138,7 +166,7 @@ int iniciar(SDL_Surface **screen, SDL_Surface **fondo, SDL_Surface **items)
  */
 int actualizar(struct opciones *opciones, int *salir)
 {
-	Uint8 *tecla;
+	const Uint8 *tecla;
 	int opcion_anterior = opciones->opcion_seleccionada;
 	int opcion = opciones->opcion_seleccionada;
 	int destino = opciones->opcion_seleccionada*30 +40;
@@ -161,15 +189,15 @@ int actualizar(struct opciones *opciones, int *salir)
 		return 0;
 	}
 	
-	tecla = SDL_GetKeyState(NULL);
+	tecla = SDL_GetKeyboardState(NULL);
 
-	if (tecla[SDLK_DOWN])
+	if (tecla[K(SDLK_DOWN)])
 		opcion++;
 
-	if (tecla[SDLK_UP])
+	if (tecla[K(SDLK_UP)])
 		opcion--;
 
-	if (tecla[SDLK_SPACE] || tecla[SDLK_RETURN])
+	if (tecla[K(SDLK_SPACE)] || tecla[K(SDLK_RETURN)])
 	{
 		switch (opcion)
 		{
@@ -262,7 +290,7 @@ void imprimir(SDL_Surface *screen, SDL_Surface *fondo, SDL_Surface *items, struc
 
 	// imprime el cursor
 	pintar_imagen(screen, items, 10, opciones->pos_x, opciones->pos_y);
-	SDL_Flip(screen);
+	Ceferino_Flip(screen);
 }
 
 /*!
@@ -302,7 +330,9 @@ int cargar_opciones(char *ruta, struct opciones *opciones)
 	opciones->pos_y=40;
 	opciones->delay=0;
 
-#ifdef WIN32
+#if defined(__OS2__)
+	ceferino_config_path(archivo, sizeof(archivo), "ceferino.cfg");
+#elif defined(WIN32)
 	strcpy(archivo, "opciones.txt");
 #else
 	strcpy(archivo, getenv("HOME"));
@@ -336,7 +366,7 @@ int cargar_opciones(char *ruta, struct opciones *opciones)
 			
 			if (tmp_encuentra == 0)
 			{
-				printf("La opción '%s' no es valida\n", nombre);
+				printf("La opciï¿½n '%s' no es valida\n", nombre);
 				fclose(arch);
 				return 1;
 			}
@@ -432,7 +462,9 @@ void salir_guardar_cambios(struct opciones *opciones)
 	FILE *arch;
 	char cadena[100];
 
-#ifdef WIN32
+#if defined(__OS2__)
+	ceferino_config_path(cadena, sizeof(cadena), "ceferino.cfg");
+#elif defined(WIN32)
 	strcpy(cadena, "opciones.txt");
 #else
 	strcpy(cadena, getenv("HOME"));

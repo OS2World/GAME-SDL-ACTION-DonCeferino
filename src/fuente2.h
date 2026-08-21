@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Don Ceferino Hazaña - video game similary to Super Pang!
  * Copyright (c) 2004, 2005 Hugo Ruscitti
  * web site: http://www.loosersjuegos.com.ar
@@ -25,8 +25,8 @@
 #ifndef _FUENTE2_H
 #define _FUENTE2_H
 
-#include <SDL/SDL.h>
-#include <SDL/SDL_image.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 
 #define KEY_R 0
 #define KEY_G 0
